@@ -1,23 +1,24 @@
-from tkinter import *
-from tkinter import messagebox
-from tkinter import ttk
+#!/usr/bin/env python3
+
 import sqlite3
 import random
 from datetime import datetime
-
 from matplotlib.pyplot import fill
+from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
 
 
-#Creats Main/root window for program
+# Creats Main/root window for program
 root = Tk()
-#Sets the title of programs and dispalys in window bar
+# Sets the title of programs and dispalys in window bar
 root.title("Lunch Program")
-#sets the favicon for window
+# sets the favicon for window
 root.iconbitmap('angry_pickle.ico')
-#sets the default root window size
+# sets the default root window size
 root.geometry("350x100")
 
-#SQL creates database file if it doesn't already exist
+# SQL creates database file if it doesn't already exist
 try:
     #create a database or connect to one
     conn = sqlite3.connect('lunch.db')
@@ -30,54 +31,54 @@ try:
         option text
     )""")
 
-    #commit changes
+    # commit changes
     conn.commit()
 
-    #close connectiong
+    # close connectiong
     conn.close()
 
-    #create a database or connect to one
+    # create a database or connect to one
     conn = sqlite3.connect('lunch.db')
     #create a database cursor
     c = conn.cursor()
 
-    #create table only need to run once
+    # create table only need to run once
     c.execute("""CREATE TABLE recent_lunch(
         restaurants text UNIQUE,
         date timestamp
     )""")
 
-    #commit changes
+    # commit changes
     conn.commit()
 
-    #close connectiong
+    # close connectiong
     conn.close()
 except:
     pass
 
-#variables
+# variables
 lunch = ""
-#variable for raidio button for adding restaurant
+# variable for raidio button for adding restaurant
 price = StringVar()
 price.set("Normal")
 
-#list to provide options for adding a restaurant
+# list to provide options for adding a restaurant
 options = [
     ("Cheap", "cheap"),
     ("Normal", "Normal")
 ]
 
-#variable for radio button when rolling lunch
+# variable for radio button when rolling lunch
 lunch_price = StringVar()
 lunch_price.set("Normal")
 
-#list options to choose from before rolling lunch
+# list options to choose from before rolling lunch
 roll_options = [
     ("Cheap", "cheap"),
     ("Normal", "Normal")
 ]
 
-#Functions
+# Functions
 def calculate_lunch():
     global lunch_label
     conn = sqlite3.connect('lunch.db')
@@ -96,7 +97,7 @@ def calculate_lunch():
         lunch_label = Label(root, text=lunch[0])
         lunch_label.grid(row=3, column=0, columnspan=4)
     else:
-        #if Less then 15 total restaunts a random choice is made regardless of previous choices
+        # if less than 15 total restaunts a random choice is made regardless of previous choices
         normal_list = []
         for record in records:
             if record[1] == 'Normal':
@@ -112,20 +113,20 @@ def calculate_lunch():
             c.execute("SELECT * FROM recent_lunch")
             records2 = c.fetchall()
             lunch = random.choice(normal_list)
-    
+
             if len(records2) > 14:
                 limit = abs(14 - len(records2))
                 c.execute("DELETE FROM recent_lunch WHERE oid IN (SELECT oid FROM recent_lunch ORDER BY date LIMIT " + str(limit) + ")")
                 c.execute("SELECT * FROM recent_lunch")
                 records2 = c.fetchall()
 
-            #create list of restaurants to check against for lunch roll preventing repeated restraunts over a 14 day period
+            # create list of restaurants to check against for lunch roll preventing repeated restraunts over a 14 day period
             list = []
             for record in records2:
                 list.append(record[0])
             while lunch[0] in list:
                 lunch=random.choice(normal_list)
-            
+
             c.execute("INSERT INTO recent_lunch VALUES (:restaurants, :date)",
                 {
                     'restaurants': lunch[0],
@@ -135,7 +136,7 @@ def calculate_lunch():
             lunch_label.grid(row=3, column=0, columnspan=4)
             lunch_label = Label(root, text=lunch[0])
             lunch_label.grid(row=3, column=0, columnspan=4)
-            
+
     conn.commit()
     conn.close()
 
@@ -157,7 +158,7 @@ def add_restaurant():
         col+=1
     add_button = Button(add_window, text="Add Restaurant", command=add_restaurant_sql)
     add_button.grid(row=2, column=1)
-    #key bindings
+    # key bindings
     add_window.bind('<Return>', add_restaurant_sql)
 
 
@@ -192,7 +193,7 @@ def delete_restaurant():
     del_button = Button(del_window, text="Delete Restaurant", command=del_restaurant_sql)
     del_button.grid(row=1, column=1)
 
-    #Create Canvas to apply Scrollbar
+    # Create Canvas to apply Scrollbar
     del_window_frame1 = Frame(del_window)
     del_window_frame1.grid(row=2, column=0, columnspan=3)
 
@@ -204,17 +205,17 @@ def delete_restaurant():
 
     del_window_canvas.configure(yscrollcommand=del_window_scrollbar.set)
     del_window_canvas.bind('<Configure>', lambda e: del_window_canvas.configure(scrollregion=del_window_canvas.bbox("all")))
-    #bind mouse wheel
+    # bind mouse wheel
     def mousewheel(event):
         del_window_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        
+
     del_window_canvas.bind('<MouseWheel>', mousewheel)
 
     del_window_frame2 = Frame(del_window_canvas)
 
     del_window_canvas.create_window((0,0), window=del_window_frame2, anchor="nw")
 
-    #generate restaurt list with prime key numbers 
+    # generate restaurt list with prime key numbers
     conn = sqlite3.connect('lunch.db')
     c = conn.cursor()
     c.execute("SELECT *, oid FROM lunch_list")
@@ -265,7 +266,7 @@ def list_all():
     #bind mouse wheel
     def mousewheel(event):
         list_window_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        
+
     list_window_canvas.bind('<MouseWheel>', mousewheel)
 
     list_window_frame2 = Frame(list_window_canvas)
@@ -287,7 +288,7 @@ def list_all():
         rvar += 1
     conn.close()
 
-#Root Widgets
+# Root Widgets
 intro_label = Label(root, text="Click below to find out what's for Lunch")
 intro_label.grid(row=0, column=0, columnspan=4)
 
@@ -309,5 +310,5 @@ for text, mode in roll_options:
     add_radio.grid(row=1, column=col1)
     col1 += 1
 
-#start program loop.
+# start program loop.
 root.mainloop()
