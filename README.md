@@ -12,6 +12,16 @@
     * [playwright](https://playwright.dev/python/docs/intro#installation)
 
 ## Usage
+### `lunch.py`
+```bash
+# install tkinter library on macos
+brew install python-tk
+
+# run app in poetry
+poetry shell
+python lunch.py
+```
+
 ### Poetry
 ```bash
 # Install
@@ -79,14 +89,26 @@ docker-compose down
 
 ## TODO
 * ~~Add README.md~~
-* PR
-* Clone
+* ~~PR~~
+* ~~Clone~~
 * QA
+    * Excluded `lunch.db` in `.gitignore`
+        * Will pollute original DB with future commits
+        * Possibly add a separate shell script to populate robust sqlite DB
+    * macOS 12.1
+        * Changed `root.geometry` to `"500x100"`
+        * Arbys [sic] seems to be the only cheap restaurant available
+            * Have to reset by selecting normal
+        * `List All` button doesn't scroll down list
 * Document
 * Extend
-  * Faithful tkinter translation via
-    * [Dart](https://dart.dev/)
-    * [Flask](https://flask.palletsprojects.com/en/2.0.x/)
-    * [Kotlin](https://kotlinlang.org/)
-    * [Svelte](https://svelte.dev)
-  * Tinder swipe right/left mechanic hehehe
+    * Fancy category
+    * Images
+    * Menus
+    * API calls to Yelp, Google, etc.
+    * Faithful tkinter translation via
+        * [Dart](https://dart.dev/)
+        * [Flask](https://flask.palletsprojects.com/en/2.0.x/)
+        * [Kotlin](https://kotlinlang.org/)
+        * [Svelte](https://svelte.dev)
+    * Tinder swipe right/left mechanic hehehe
