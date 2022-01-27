@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sqlite3
 import random
+import sqlite3
 from datetime import datetime
 from matplotlib.pyplot import fill
 from tkinter import *
@@ -103,7 +103,7 @@ def calculate_lunch():
             if record[1] == 'Normal':
                 normal_list.append(record)
         if len(normal_list) < 15:
-            lunch = random.choice(normal_list)
+            lunch = random.choice(range(len(normal_list)))
             lunch_label = Label(root, text="                            ")
             lunch_label.grid(row=3, column=0, columnspan=4)
             lunch_label = Label(root, text=lunch[0])
