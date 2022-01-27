@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+import csv
 import random
 import sqlite3
 from datetime import datetime
 from matplotlib.pyplot import fill
+from pathlib import Path
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -18,43 +20,38 @@ root.iconbitmap('angry_pickle.ico')
 # sets the default root window size
 root.geometry("500x100")
 
-# SQL creates database file if it doesn't already exist
-try:
-    # create a database or connect to one
-    conn = sqlite3.connect('lunch.db')
-    #create a database cursor
-    c = conn.cursor()
+# TODO: QA csv import
+# TODO: connect to sqlite to check table values; fix bare except
+# SQL creates database file if it doesn't already exist or missing data
+if not Path("./lunch.db").is_file():
+    try:
+         # open connection
+        conn = sqlite3.connect('lunch.db')
+        c = conn.cursor()
 
-    # create table only need to run once
-    c.execute("""CREATE TABLE lunch_list(
-        restaurants text UNIQUE,
-        option text
-    )""")
+        # create tables
+        c.execute("CREATE TABLE lunch_list (oid INTEGER PRIMARY KEY, restaurants TEXT, option TEXT)")
+        c.execute("CREATE TABLE recent_lunch (oid INTEGER PRIMARY KEY, restaurants TEXT, date TEXT)")
 
-    # commit changes
-    conn.commit()
-
-    # close connectiong
-    conn.close()
-
-    # create a database or connect to one
-    conn = sqlite3.connect('lunch.db')
-    #create a database cursor
-    c = conn.cursor()
-
-    # create table only need to run once
-    c.execute("""CREATE TABLE recent_lunch(
-        restaurants text UNIQUE,
-        date timestamp
-    )""")
-
-    # commit changes
-    conn.commit()
-
-    # close connectiong
-    conn.close()
-except:
-    pass
+        # insert csv data into database tables
+        # lunch_list
+        with open('lunch_list.csv', 'r') as f:
+            rows = csv.reader(f)
+            c.executemany("INSERT INTO lunch_list VALUES (?, ?)", rows)
+            c.execute("SELECT * FROM lunch_list")
+            print(c.fetchall())
+        # recent_lunch
+        with open('recent_lunch.csv', 'r') as f:
+            rows = csv.reader(f)
+            c.executemany("INSERT INTO recent_lunch VALUES (?, ?)", rows)
+            c.execute("SELECT * FROM recent_lunch")
+            print(c.fetchall())
+    except:
+        pass
+    finally:
+        # commit and close connection
+        conn.commit()
+        conn.close()
 
 # variables
 lunch = ""
