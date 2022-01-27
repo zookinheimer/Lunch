@@ -6,9 +6,10 @@
 
 ## Setup
 * Install 
-    * [editorconfig](https://editorconfig.org/)
+    # [asdf](https://asdf-vm.com/guide/getting-started.html)
     * [poetry](https://python-poetry.org/docs/)
     * [docker-compose](https://docs.docker.com/compose/install/)
+    * [editorconfig](https://editorconfig.org/)
     * [playwright](https://playwright.dev/python/docs/intro#installation)
 
 ## Usage
@@ -17,7 +18,14 @@
 # install tkinter library on macos
 brew install python-tk
 
+# asdf
+asdf install python 3.9
+
+# asdf local version of python
+asdf local 3.9.10
+
 # run app in poetry
+poetry env use 3.9.10
 poetry shell
 python lunch.py
 ```
