@@ -16,16 +16,16 @@ root.title("Lunch Program")
 # sets the favicon for window
 root.iconbitmap('angry_pickle.ico')
 # sets the default root window size
-root.geometry("350x100")
+root.geometry("500x100")
 
 # SQL creates database file if it doesn't already exist
 try:
-    #create a database or connect to one
+    # create a database or connect to one
     conn = sqlite3.connect('lunch.db')
     #create a database cursor
     c = conn.cursor()
 
-    #create table only need to run once
+    # create table only need to run once
     c.execute("""CREATE TABLE lunch_list(
         restaurants text UNIQUE,
         option text
