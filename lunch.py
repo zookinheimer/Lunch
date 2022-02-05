@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import csv
+# import os
+import platform
 import PySimpleGUI as sg
 import random
 import sqlite3
@@ -19,7 +21,12 @@ root.title("Lunch Program")
 # sets the favicon for window
 root.iconbitmap('angry_pickle.ico')
 # sets the default root window size
-root.geometry("500x100")
+if platform.system() == "win32":
+    root.geometry("350x100")
+elif platform.system() == "Darwin":
+    root.geometry("500x100")
+elif platform.system() == "linux" or platform.system() == "linux2":
+    root.geometry("350x100")
 
 # TODO: QA csv import
 # TODO: connect to sqlite to check table values; fix bare except
