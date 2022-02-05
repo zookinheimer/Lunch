@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 import csv
+import os
+import platform
 import random
 import sqlite3
 from datetime import datetime
-from matplotlib.pyplot import fill
+# from matplotlib.pyplot import fill
 from pathlib import Path
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-
 
 # Creats Main/root window for program
 root = Tk()
@@ -18,7 +19,12 @@ root.title("Lunch Program")
 # sets the favicon for window
 root.iconbitmap('angry_pickle.ico')
 # sets the default root window size
-root.geometry("500x100")
+if platform == "win32":
+    root.geometry("350x100")
+elif platform == "darwin":
+    root.geometry("500x100")
+elif platform == "linux" or platform == "linux2":
+    root.geometry("350x100")
 
 # TODO: QA csv import
 # TODO: connect to sqlite to check table values; fix bare except
