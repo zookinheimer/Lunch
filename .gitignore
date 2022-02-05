@@ -1,6 +1,9 @@
 # ETC
 .vscode/
 lunch.db
+scratch.py
+auth/
+.htpasswd
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
