@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import csv
-import os
+# import os
 import platform
 import random
 import sqlite3
@@ -18,12 +18,13 @@ root = Tk()
 root.title("Lunch Program")
 # sets the favicon for window
 root.iconbitmap('angry_pickle.ico')
+# TODO: get output of `platform.system()` on Windows and Linux
 # sets the default root window size
-if platform == "win32":
+if platform.system() == "win32":
     root.geometry("350x100")
-elif platform == "darwin":
+elif platform.system() == "Darwin":
     root.geometry("500x100")
-elif platform == "linux" or platform == "linux2":
+elif platform.system() == "linux" or platform.system() == "linux2":
     root.geometry("350x100")
 
 # TODO: QA csv import
