@@ -6,7 +6,7 @@
 
 ## Setup
 * Install 
-    # [asdf](https://asdf-vm.com/guide/getting-started.html)
+    * [asdf](https://asdf-vm.com/guide/getting-started.html)
     * [poetry](https://python-poetry.org/docs/)
     * [docker-compose](https://docs.docker.com/compose/install/)
     * [editorconfig](https://editorconfig.org/)
@@ -95,6 +95,39 @@ docker-compose down
     docker_python      python manage.py runserver ...   Exit 0
     ```
 
+## Packaging
+Local test [pypiserver](https://github.com/pypiserver/pypiserver) and [official repo](https://pypi.org).
+
+**NOTE**  
+Confirm repo name is [available](https://pypi.org/help/#project-name) before uploading to PyPi.
+
+```bash
+## BOTH
+# build package
+poetry build
+
+## DOCKER
+# setup mount directory
+mkdir -p auth
+
+# use passlib to setup .htpasswd
+htpasswd -sc auth/.htpasswd someuser
+
+# run local pypi
+docker run -p 80:8080 -v $(pwd)/auth/:/data/auth pypiserver/pypiserver:latest -P /data/auth/.htpasswd -a update,download,list /data/packages
+
+# configure repo
+poetry config repositories.test http://localhost
+
+# "upload" package to docker
+poetry publish -r test
+
+## PYPI
+# "upload" package to pypi (build switch is optional)
+export API_TOKEN=super_secret_api_key
+poetry publish -u __token__ -p $API_TOKEN --build
+```
+
 ## TODO
 * ~~Add README.md~~
 * ~~PR~~
@@ -120,3 +153,8 @@ docker-compose down
         * [Kotlin](https://kotlinlang.org/)
         * [Svelte](https://svelte.dev)
     * Tinder swipe right/left mechanic hehehe
+
+## Further Reading
+[Python Poetry, finally easy build and deploy packages | by Jose Alberto Torres Agüera | Lambda Automotive | Medium](https://medium.com/lambda-automotive/python-poetry-finally-easy-build-and-deploy-packages-e1e84c23401f)  
+
+[Python 101: Developing Package with Poetry | by Julio Anthony Leonard | Bootcampers | Medium](https://medium.com/bootcampers/python-101-developing-package-with-poetry-449c57690350)
