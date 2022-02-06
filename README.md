@@ -76,7 +76,7 @@ docker-compose build --no-cache --parallel
 docker-compose up --remove-orphans -d
 
 # exec into container
-docker attach hello
+docker attach lunch
 
 # run command inside container
 python hello.py
