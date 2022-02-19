@@ -76,7 +76,7 @@ docker-compose build --no-cache --parallel
 docker-compose up --remove-orphans -d
 
 # exec into container
-docker attach hello
+docker attach lunch
 
 # run command inside container
 python hello.py
@@ -155,6 +155,8 @@ poetry publish -u __token__ -p $API_TOKEN --build
     * Tinder swipe right/left mechanic hehehe
 
 ## Further Reading
+[Call reference - PySimpleGUI](https://pysimplegui.readthedocs.io/en/latest/call%20reference)
+
 [Python Poetry, finally easy build and deploy packages | by Jose Alberto Torres Agüera | Lambda Automotive | Medium](https://medium.com/lambda-automotive/python-poetry-finally-easy-build-and-deploy-packages-e1e84c23401f)  
 
 [Python 101: Developing Package with Poetry | by Julio Anthony Leonard | Bootcampers | Medium](https://medium.com/bootcampers/python-101-developing-package-with-poetry-449c57690350)
