@@ -3,7 +3,7 @@
 import PySimpleGUI as sg
 import random
 import sqlite3
-# from datetime import datetime
+from datetime import datetime
 from icecream import ic
 # from matplotlib.pyplot import fill
 # from pathlib import Path
@@ -46,24 +46,77 @@ mainscreen = sg.Window(
     element_justification='c',
 ).Finalize()
 
+
+def calculate_lunch(lunch_price):
+    """ 
+    this function makes a random choice for lunch based on price
+    point. cheap will choose a random choice from list. if normal it
+    will choose a random option from the database if the entrys are 
+    under 14 if over it will make a random choice against 2nd table 
+    and either reroll a new random choice or proceed with original
+    option depending on if option is present.
+    """
+
+    conn = sqlite3.connect('lunch.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM lunch_list")
+    records = c.fetchall()
+    if lunch_price == "cheap":
+        cheap_list = []
+        for record in records:
+            if record[1] == 'cheap':
+                cheap_list.append(record)
+        lunch = random.choice(cheap_list)
+    else:
+        # if less than 15 total restaunts a random choice is made regardless of previous choices
+        normal_list = []
+        for record in records:
+            if record[1] == 'Normal':
+                normal_list.append(record)
+        if len(normal_list) < 15:
+            lunch = random.choice(range(len(normal_list)))
+        else:
+        # if over 15 total restaurants are available a random choice is made with consideration of the previous 14 picked options
+            c.execute("SELECT * FROM recent_lunch")
+            records2 = c.fetchall()
+            lunch = random.choice(normal_list)
+
+            if len(records2) > 14:
+                limit = abs(14 - len(records2))
+                c.execute("DELETE FROM recent_lunch WHERE oid IN (SELECT oid FROM recent_lunch ORDER BY date LIMIT " + str(limit) + ")")
+                c.execute("SELECT * FROM recent_lunch")
+                records2 = c.fetchall()
+
+            # create list of restaurants to check against for lunch roll preventing repeated restraunts over a 14 day period
+            list = []
+            for record in records2:
+                list.append(record[0])
+            while lunch[0] in list:
+                lunch = random.choice(normal_list)
+
+            c.execute("INSERT INTO recent_lunch VALUES (:restaurants, :date)",
+                {
+                    'restaurants': lunch[0],
+                    'date': datetime.now()
+                })
+
+    conn.commit()
+    conn.close()
+
+    return lunch
+
+
 while True:
     event, value = mainscreen.Read()
     if event in (None, 'Cancel'):
         break
     if event in (None, 'Roll Lunch'):
         if value['cheap'] == True:
-            lunch = "Cheap"
+            lunch_price = "cheap"
         elif value['normal'] == True:
-            lunch = "Normal"
-        # TODO: get list of restaurants from database (cf. `calculate_lunch`)
-        # restaurant = random.choice()
-        conn = sqlite3.connect('lunch.db')
-        c = conn.cursor()
-        c.execute(f"""SELECT * FROM lunch_list WHERE "option" LIKE '{lunch}'""")
-        result = c.fetchall()
-        conn.close()
-        # TODO: table view
-        sg.Popup(result)
+            lunch_price = "normal"
+        result = calculate_lunch(lunch_price)
+        sg.Popup(result[0])
     # TODO: validate input (e.g., empty string, non alphanumeric, etc.)
     # TODO: escape single quotes in `name` (cf. `'McDonald''s'`)
     if event in (None, 'Add Restaurant'):
@@ -99,6 +152,9 @@ while True:
         c = conn.cursor()
         c.execute("SELECT *, oid FROM lunch_list")
         results = c.fetchall()
+        list_all = []
+        # TODO: table view of results (currently a list)
+        for result in results:
+            list_all.append(result[0])
+        sg.Popup(list_all)
         conn.close()
-        # TODO: table view
-        sg.Popup(results)
