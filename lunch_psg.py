@@ -2,6 +2,7 @@
 
 import PySimpleGUI as sg
 import random
+import re
 import sqlite3
 from datetime import datetime
 from icecream import ic
@@ -67,7 +68,7 @@ def calculate_lunch(lunch_price):
         if lunch_price == "cheap":
             cheap_list = []
             for record in records:
-                if record[1] == 'cheap':
+                if re.search(r'cheap', record[1], re.IGNORECASE):
                     cheap_list.append(record)
             lunch = random.choice(cheap_list)
         else:
@@ -75,7 +76,7 @@ def calculate_lunch(lunch_price):
             # regardless of previous choices
             normal_list = []
             for record in records:
-                if record[1] == 'Normal':
+                if re.search(r'normal', record[1], re.IGNORECASE):
                     normal_list.append(record)
             if len(normal_list) < 15:
                 lunch = random.choice(range(len(normal_list)))
