@@ -140,6 +140,7 @@ poetry publish -u __token__ -p $API_TOKEN --build
         * Changed `root.geometry` to `"500x100"
         * `List All` button doesn't scroll down list
 * Document
+* Convert to PySimpleGUI
 * Extend
     * Fancy category
     * Images
