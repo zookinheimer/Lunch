@@ -6,10 +6,13 @@ import re
 import sqlite3
 from datetime import datetime
 from icecream import ic
-# from matplotlib.pyplot import fill
 # from pathlib import Path
 
 sg.ChangeLookAndFeel('SystemDefault')
+sg.SetOptions(
+            button_color = sg.COLOR_SYSTEM_DEFAULT,
+            text_color = sg.COLOR_SYSTEM_DEFAULT
+)
 
 lunch = ""
 price = ""
@@ -27,15 +30,14 @@ roll_options = [
     ("Normal", "Normal")
 ]
 
-# TODO: remove theme on buttons
 layout= [
     [sg.Text(r"Click below to find out what's for Lunch")],
     [sg.Radio('Cheap', "lunch", key='cheap', default=True),
     sg.Radio('Normal', "lunch", key='normal')],
-    [sg.Button('Roll Lunch', pad=5, use_ttk_buttons=None),
-    sg.Button('Add Restaurant', pad=5, use_ttk_buttons=None),
-    sg.Button('Delete Restaurant', pad=5, use_ttk_buttons=None),
-    sg.Button('List All', pad=5, use_ttk_buttons=None),
+    [sg.Button('Roll Lunch', pad=5),
+    sg.Button('Add Restaurant', pad=5),
+    sg.Button('Delete Restaurant', pad=5),
+    sg.Button('List All', pad=5),
     ],
 ]
 
@@ -125,6 +127,27 @@ def calculate_lunch(lunch_price):
     return lunch
 
 
+# TODO: fix function. Fails to validate input accepting empty strings et al
+def valid_name(name):
+    """
+    Checks if the name is valid.
+
+    Checks if the name is valid by checking if it is a string and
+    if it is not empty.
+    """
+
+    name_regex = re.compile(r'^[a-zA-Z0-9\s\!\'\"]*$')
+
+    if not isinstance(name, str) and name != "":
+        while not name_regex.match(name):
+            sg.Popup("Please enter a valid restaurant name")
+            name = sg.PopupGetText('Enter the name of the restaurant')
+
+    name = name.strip().title()
+
+    return name
+
+
 while True:
     event, value = mainscreen.Read()
     if event in (None, 'Cancel'):
@@ -139,7 +162,7 @@ while True:
 
     if event in (None, 'Add Restaurant'):
         name = sg.PopupGetText('Enter the name of the restaurant')
-        name_regex = re.compile(r'^[a-zA-Z0-9\s\!\.\'\"]*$')
+        name_regex = re.compile(r'^[a-zA-Z0-9\s\!\'\"]*$')
         while not name_regex.match(name):
             sg.Popup("Please enter a valid restaurant name")
             name = sg.PopupGetText('Enter the name of the restaurant')
@@ -170,6 +193,7 @@ while True:
             sg.Popup('Restaurant already added')
             continue
 
+    # TODO: validate input (see: valid_name)
     if event in (None, 'Delete Restaurant'):
         name = sg.PopupGetText('Delete a restaurant')
         conn = sqlite3.connect('lunch.db')
@@ -177,14 +201,28 @@ while True:
         c.execute(f"""DELETE FROM lunch_list WHERE "restaurants" = '{name}'""")
         conn.commit()
         conn.close()
+
     if event in (None, 'List All'):
         conn = sqlite3.connect('lunch.db')
         c = conn.cursor()
         c.execute("SELECT *, oid FROM lunch_list")
         results = c.fetchall()
+        conn.close()
+
         list_all = []
-        # TODO: table view of results (currently a list)
         for result in results:
             list_all.append(result[0])
-        sg.Popup(list_all)
-        conn.close()
+        # print(*list_all, sep='\n')
+        # print('\n'.join(str(i) for i in list_all))
+
+        layout = [
+            [sg.Listbox(values=list_all, size=(20, len(list_all)))],
+            [sg.Button('Okay', bind_return_key=True)]
+        ]
+        window = sg.Window('List All', layout)
+        event, values = window.read()
+        if event in (None, 'Okay'):
+            window.close()
+
+         # TODO: table view of results (currently a list)
+
