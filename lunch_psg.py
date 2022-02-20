@@ -47,61 +47,79 @@ mainscreen = sg.Window(
 ).Finalize()
 
 
+# TODO: error handling for when a category is missing (IndexError) -- repro by deleting the last item in a category
 def calculate_lunch(lunch_price):
-    """ 
-    this function makes a random choice for lunch based on price
-    point. cheap will choose a random choice from list. if normal it
-    will choose a random option from the database if the entrys are 
-    under 14 if over it will make a random choice against 2nd table 
-    and either reroll a new random choice or proceed with original
-    option depending on if option is present.
+    """
+    Makes a random choice for lunch based on price point.
+
+    "Cheap" will choose a random choice from list. If "Normal", it will
+    choose a random option from the database if the number of entries
+    are under 14; if over it will make a random choice against 2nd table
+    and either reroll a new random choice or proceed with original option
+    if it's present.
     """
 
     conn = sqlite3.connect('lunch.db')
     c = conn.cursor()
     c.execute("SELECT * FROM lunch_list")
     records = c.fetchall()
-    if lunch_price == "cheap":
-        cheap_list = []
-        for record in records:
-            if record[1] == 'cheap':
-                cheap_list.append(record)
-        lunch = random.choice(cheap_list)
-    else:
-        # if less than 15 total restaunts a random choice is made regardless of previous choices
-        normal_list = []
-        for record in records:
-            if record[1] == 'Normal':
-                normal_list.append(record)
-        if len(normal_list) < 15:
-            lunch = random.choice(range(len(normal_list)))
+    try:
+        if lunch_price == "cheap":
+            cheap_list = []
+            for record in records:
+                if record[1] == 'cheap':
+                    cheap_list.append(record)
+            lunch = random.choice(cheap_list)
         else:
-        # if over 15 total restaurants are available a random choice is made with consideration of the previous 14 picked options
-            c.execute("SELECT * FROM recent_lunch")
-            records2 = c.fetchall()
-            lunch = random.choice(normal_list)
-
-            if len(records2) > 14:
-                limit = abs(14 - len(records2))
-                c.execute("DELETE FROM recent_lunch WHERE oid IN (SELECT oid FROM recent_lunch ORDER BY date LIMIT " + str(limit) + ")")
+            # if less than 15 total restaunts a random choice is made
+            # regardless of previous choices
+            normal_list = []
+            for record in records:
+                if record[1] == 'Normal':
+                    normal_list.append(record)
+            if len(normal_list) < 15:
+                lunch = random.choice(range(len(normal_list)))
+            else:
+            # if over 15 total restaurants are available a random choice
+            # is made with consideration of the previous 14 picked options
                 c.execute("SELECT * FROM recent_lunch")
                 records2 = c.fetchall()
-
-            # create list of restaurants to check against for lunch roll preventing repeated restraunts over a 14 day period
-            list = []
-            for record in records2:
-                list.append(record[0])
-            while lunch[0] in list:
                 lunch = random.choice(normal_list)
 
-            c.execute("INSERT INTO recent_lunch VALUES (:restaurants, :date)",
-                {
-                    'restaurants': lunch[0],
-                    'date': datetime.now()
-                })
+                if len(records2) > 14:
+                    limit = abs(14 - len(records2))
+                    c.execute(
+                        """
+                        DELETE FROM recent_lunch
+                        WHERE oid IN (SELECT oid
+                        FROM recent_lunch
+                        ORDER BY date
+                        LIMIT """ + str(limit) + ")"
+                    )
+                    c.execute("SELECT * FROM recent_lunch")
+                    records2 = c.fetchall()
 
-    conn.commit()
-    conn.close()
+                # create list of restaurants to check against for
+                # lunch roll preventing repeated restraunts over a 14 day period
+                list = []
+                for record in records2:
+                    list.append(record[0])
+                while lunch[0] in list:
+                    lunch = random.choice(normal_list)
+
+                c.execute("INSERT INTO recent_lunch VALUES (:restaurants, :date)",
+                    {
+                        'restaurants': lunch[0],
+                        'date': datetime.now()
+                    })
+                conn.commit()
+    except (IndexError, UnboundLocalError):
+        print("No lunch today")
+        conn.commit()
+        conn.close()
+        exit()
+    finally:
+        conn.close()
 
     return lunch
 
