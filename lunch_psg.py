@@ -136,18 +136,27 @@ while True:
             lunch_price = "normal"
         result = calculate_lunch(lunch_price)
         sg.Popup(result[0])
-    # TODO: validate input (e.g., empty string, non alphanumeric, etc.)
-    # TODO: escape single quotes in `name` (cf. `'McDonald''s'`)
+
     if event in (None, 'Add Restaurant'):
         name = sg.PopupGetText('Enter the name of the restaurant')
-        while name.isalnum() == False or name.isalpha() == False:
+        name_regex = re.compile(r'^[a-zA-Z0-9\s\!\.\'\"]*$')
+        while not name_regex.match(name):
             sg.Popup("Please enter a valid restaurant name")
             name = sg.PopupGetText('Enter the name of the restaurant')
+        name = name.strip().title()
 
-        price = (sg.PopupGetText('Cheap or Normal')).lower()
-        while price != 'cheap' or price != 'normal':
-            sg.Popup("Please enter a valid type of restaurant")
-            price = sg.PopupGetText('Cheap or Normal')
+        restaurant_type = sg.popup(
+            title = 'Add Restaurant',
+            button_color = None,
+            custom_text = ('Cheap', 'Normal'),
+            keep_on_top = True
+        )
+
+        if restaurant_type == 'Cheap':
+            price = "cheap"
+        elif restaurant_type == 'Normal':
+            price = "normal"
+        price = price.strip().title()
 
         try:
             conn = sqlite3.connect('lunch.db')
@@ -159,6 +168,8 @@ while True:
             sg.Popup("Restaurant added successfully")
         except sqlite3.IntegrityError:
             sg.Popup('Restaurant already added')
+            continue
+
     if event in (None, 'Delete Restaurant'):
         name = sg.PopupGetText('Delete a restaurant')
         conn = sqlite3.connect('lunch.db')
