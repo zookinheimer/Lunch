@@ -137,9 +137,7 @@ poetry publish -u __token__ -p $API_TOKEN --build
         * Will pollute original DB with future commits
         * Possibly add a separate shell script to populate robust sqlite DB
     * macOS 12.1
-        * Changed `root.geometry` to `"500x100"`
-        * Arbys [sic] seems to be the only cheap restaurant available
-            * Have to reset by selecting normal
+        * Changed `root.geometry` to `"500x100"
         * `List All` button doesn't scroll down list
 * Document
 * Extend
