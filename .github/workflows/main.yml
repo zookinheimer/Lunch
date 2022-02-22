@@ -1,5 +1,3 @@
-# SOURCE: https://stackoverflow.com/a/68213855
-
 name: Send submodule updates to parent repo
 
 on:
