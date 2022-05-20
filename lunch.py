@@ -63,7 +63,7 @@ if not Path("./lunch.db").is_file():
 
 # variables
 lunch = ""
-# variable for raidio button for adding restaurant
+# variable for radio button for adding restaurant
 price = StringVar()
 price.set("Normal")
 
