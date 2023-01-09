@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.9"
 PySimpleGUI = "^4.56.0"
 passlib = "^1.7.4"
+flet = "^0.3.2"
 
 [tool.poetry.dev-dependencies]
 icecream = "^2.1.1"
