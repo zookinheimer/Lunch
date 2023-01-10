@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 import flet as ft
-import random
+# import random
 # import sqlite3
-from datetime import datetime
+# from datetime import datetime
 from dataclasses import dataclass, field
 from flet.buttons import RoundedRectangleBorder
 from pathlib import Path
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+# from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import Optional, Dict, List, Tuple
 
+# TODO: import .util; connect to db; bind to buttons; create views based on button clicks
 
 @dataclass
 class CustomButton():
