@@ -2,21 +2,16 @@
 
 # import random
 # from icecream import ic
+from datetime import datetime
 from pathlib import Path
+from sqlalchemy import Column, func, Table, Text, TIMESTAMP
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import Optional, Dict, List, Tuple
-
-from dataclasses import dataclass, field
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Table, Text
-from sqlalchemy.orm import registry
 
 # verbose icecream
 # ic.configureOutput(includeContext=True)
 
-mapper_registry = registry()
-metadata = mapper_registry.metadata
+metadata = SQLModel.metadata
 
 
 t_lunch_list = Table(
@@ -33,17 +28,6 @@ t_recent_lunch = Table(
 )
 
 
-@mapper_registry.mapped
-@dataclass
-class Restaurant:
-    __tablename__ = 'restaurant'
-    __sa_dataclass_metadata_key__ = 'sa'
-
-    id: int = field(init=False, metadata={'sa': Column(Integer, primary_key=True)})
-    restaurant: str = field(metadata={'sa': Column(String, nullable=False)})
-    option: str = field(metadata={'sa': Column(String, nullable=False)})
-
-
 db_fn = Path(__file__).parent / "lunch.db"
 csv_fn = Path(__file__).parent / "restaurants.csv"
 
@@ -56,19 +40,17 @@ def create_db_and_tables():
 
 def get_all_restaurants():
     with Session(engine) as session:
-        statement = select(Restaurant)
+        statement = select(t_lunch_list)
         restaurants = session.exec(statement).all()
-        return [i for i in restaurants if print(i.restaurant)]    # pretty print restaurants only
-        return [i.restaurant for i in restaurants]                  # return list of restaurant names
+        # return [i for i in restaurants if print(i)]       # pretty print restaurants only
+        return [i for i in restaurants]                     # return list of restaurant names
 
 
 def get_restaurants(option):
     with Session(engine) as session:
-        statement = select(Restaurant).where(Restaurant.option == option)
+        statement = select(t_lunch_list).where(func.lower(t_lunch_list.c.option) == option.lower()) # case insensitive
         restaurants = session.exec(statement).all()
-        # print(f"Getting {option} restaurants:")
-        return [i for i in restaurants if i.option == option and print(i.restaurant)]
-
+        return [i for i in restaurants]
 
 # def calculate_lunch():
 #     global lunch_label
@@ -111,7 +93,7 @@ def main():
     create_db_and_tables()
 
     print(get_all_restaurants())
-    print(get_restaurants("normal"))
+    print(get_restaurants("Cheap"))
 
 
 if __name__ == "__main__":
