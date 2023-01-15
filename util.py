@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# import random
+import random
 # from icecream import ic
 from datetime import datetime
 from pathlib import Path
@@ -31,7 +31,7 @@ t_recent_lunch = Table(
 db_fn = Path(__file__).parent / "lunch.db"
 csv_fn = Path(__file__).parent / "restaurants.csv"
 
-engine = create_engine(f"sqlite:///{db_fn.name}", echo=True)
+engine = create_engine(f"sqlite:///{db_fn.name}", echo=False)
 
 
 def create_db_and_tables():
@@ -52,6 +52,13 @@ def get_restaurants(option):
         restaurants = session.exec(statement).all()
         return [i for i in restaurants]
 
+
+def rng_restaurant(option):
+    with Session(engine) as session:
+        statement = select(t_lunch_list).where(func.lower(t_lunch_list.c.option) == option.lower()) # case insensitive
+        restaurants = session.exec(statement).all()
+        return random.choice(restaurants)
+
 # def calculate_lunch():
 #     global lunch_label
 
@@ -67,33 +74,10 @@ def get_restaurants(option):
 
 
 def main():
-    # if not db_fn.exists():
-    #     print("Creating database.")
-    #     create_db_and_tables()
-
-    #     if csv_fn.exists():
-    #         with Session(engine) as session:
-    #             with open(csv_fn) as f:
-    #                 for line in f:
-    #                     if line.startswith("restaurant"):
-    #                         continue
-    #                     restaurant, option = line.strip().split(",")
-    #                     session.add(Restaurant(restaurant=restaurant, option=option))
-    #             session.commit()
-    #     else:
-    #         with Session(engine) as session:
-    #             session.add(Restaurant(restaurant="McDonald's", option="cheap"))
-    #             session.add(Restaurant(restaurant="Taco John's", option="normal"))
-    #             session.commit()
-
-    #     print("Database created!")
-    # else:
-    #     print("Database already exists.")
-
     create_db_and_tables()
-
     print(get_all_restaurants())
-    print(get_restaurants("Cheap"))
+    print(get_restaurants("Normal"))
+    print(rng_restaurant("Normal"))
 
 
 if __name__ == "__main__":
