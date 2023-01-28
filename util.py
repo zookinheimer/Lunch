@@ -77,7 +77,7 @@ def main():
     create_db_and_tables()
     print(get_all_restaurants())
     print(get_restaurants("Normal"))
-    print(rng_restaurant("Normal"))
+    print(rng_restaurant("Cheap"))
 
 
 if __name__ == "__main__":
