@@ -10,6 +10,9 @@ python = "^3.11"
 PySimpleGUI = "^4.56.0"
 passlib = "^1.7.4"
 flet = "^0.3.2"
+tk = "^0.1.0"
+sqlmodel = "^0.0.8"
+sqlacodegen = {git = "https://github.com/agronholm/sqlacodegen.git"}
 
 [tool.poetry.dev-dependencies]
 icecream = "^2.1.1"
