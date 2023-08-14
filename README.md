@@ -6,26 +6,23 @@
 
 ## Setup
 * Install 
-    * [asdf](https://asdf-vm.com/guide/getting-started.html)
-    * [poetry](https://python-poetry.org/docs/)
-    * [docker-compose](https://docs.docker.com/compose/install/)
-    * [editorconfig](https://editorconfig.org/)
-    * [playwright](https://playwright.dev/python/docs/intro#installation)
+  * [asdf](https://asdf-vm.com/guide/getting-started.html)
+  * [poetry](https://python-poetry.org/docs/)
+  * [docker-compose](https://docs.docker.com/compose/install/)
+  * [editorconfig](https://editorconfig.org/)
+  * [playwright](https://playwright.dev/python/docs/intro#installation)
 
 ## Usage
 ### `lunch.py`
 ```bash
-# install tkinter library on macos
-brew install python-tk
-
 # asdf
-asdf install python 3.9
+asdf install python latest
 
 # asdf local version of python
-asdf local 3.9.10
+asdf local latest
 
 # run app in poetry
-poetry env use 3.9.10
+poetry env use latest
 poetry shell
 python lunch.py
 ```
@@ -37,7 +34,6 @@ curl -sSL https://install.python-poetry.org | $(which python3) -
 
 # Change config
 poetry config virtualenvs.in-project true           # .venv in `pwd`
-poetry config experimental.new-installer false      # fixes JSONDecodeError on Python3.10
 
 # Activate virtual environment (venv)
 poetry shell
@@ -76,10 +72,10 @@ docker-compose build --no-cache --parallel
 docker-compose up --remove-orphans -d
 
 # exec into container
-docker attach lunch
+docker exec -it lunch bash
 
 # run command inside container
-python hello.py
+python lunch.py
 
 # destroy container
 docker-compose down
@@ -87,13 +83,6 @@ docker-compose down
 
 #### Docker Troubleshooting
 * Watch logs in real-time: `docker-compose logs -tf --tail="50" hello`
-* Check exit code
-    ```bash
-    $ docker-compose ps
-    Name                          Command               State    Ports
-    ------------------------------------------------------------------------------
-    docker_python      python manage.py runserver ...   Exit 0
-    ```
 
 ## Packaging
 Local test [pypiserver](https://github.com/pypiserver/pypiserver) and [official repo](https://pypi.org).
@@ -129,33 +118,19 @@ poetry publish -u __token__ -p $API_TOKEN --build
 ```
 
 ## TODO
-* ~~Add README.md~~
-* ~~PR~~
-* ~~Clone~~
 * QA
-    * Excluded `lunch.db` in `.gitignore`
-        * Will pollute original DB with future commits
-        * Possibly add a separate shell script to populate robust sqlite DB
-    * macOS 12.1
-        * Changed `root.geometry` to `"500x100"
-        * `List All` button doesn't scroll down list
+  * macOS 12.1
+    * `List All` button doesn't scroll down list
 * Document
-* Convert to PySimpleGUI
+* Convert to ~~PySimpleGUI~~ NiceGUI
 * Extend
-    * Fancy category
-    * Images
-    * Menus
-    * API calls to Yelp, Google, etc.
-    * Faithful tkinter translation via
-        * [Dart](https://dart.dev/)
-        * [Flask](https://flask.palletsprojects.com/en/2.0.x/)
-        * [Kotlin](https://kotlinlang.org/)
-        * [Svelte](https://svelte.dev)
-    * Tinder swipe right/left mechanic hehehe
+  * Fancy category
+  * Images
+  * Menus
+  * API calls to Yelp, Google, etc.
+  * Tinder swipe right/left mechanic hehehe
 
 ## Further Reading
-[Call reference - PySimpleGUI](https://pysimplegui.readthedocs.io/en/latest/call%20reference)
-
 [Python Poetry, finally easy build and deploy packages | by Jose Alberto Torres Agüera | Lambda Automotive | Medium](https://medium.com/lambda-automotive/python-poetry-finally-easy-build-and-deploy-packages-e1e84c23401f)  
 
 [Python 101: Developing Package with Poetry | by Julio Anthony Leonard | Bootcampers | Medium](https://medium.com/bootcampers/python-101-developing-package-with-poetry-449c57690350)
