@@ -4,7 +4,6 @@ import random
 # from icecream import ic
 from datetime import datetime
 from pathlib import Path
-# from sqlalchemy import Column, func, Table, Text, TIMESTAMP
 from sqlalchemy import Column, func, Integer, String, Table, Text, TIMESTAMP
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import Optional, Dict, List, Tuple
@@ -113,12 +112,11 @@ def delete_restaurant(name):
     with Session(engine) as session:
         print(f"Deleting {name} from database.")
         statement = select(t_lunch_list.c.id).where(t_lunch_list.c.restaurant == name)
-        restaurant_id = session.exec(statement).scalar()
+        restaurant_id = session.exec(statement).first()
         if not restaurant_id:
             return print(f"{name} does not exist in database.")
         else:
-            restaurant_instance = session.query(t_lunch_list).get(restaurant_id)
-            session.delete(restaurant_instance)
+            statement = t_lunch_list.delete().where(t_lunch_list.c.id == restaurant_id)
             session.commit()
             return print(f"{name} deleted from database.")
 
