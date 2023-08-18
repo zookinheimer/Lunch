@@ -160,7 +160,6 @@ Handles formatting of files. [Install the editorconfig plugin](https://editorcon
 
 * [Dependabot](https://dependabot.com/) is a GitHub tool that automatically creates pull requests to keep dependencies up to date.
 
-
 ## TODO
 
 * QA
@@ -174,6 +173,8 @@ Handles formatting of files. [Install the editorconfig plugin](https://editorcon
 * Document
 * ~~Convert to ~~PySimpleGUI~~ NiceGUI~~
 * Extend
+  * [semantic-release](https://github.com/semantic-release/semantic-release)
+  * sqlite -> postgres
   * Fancy category
   * Images
   * Menus
