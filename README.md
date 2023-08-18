@@ -59,7 +59,7 @@ Additional tooling includes but is not limited to:
     asdf plugin-add python
 
     # install stable python
-    asdf install python <latest|3.10.12>
+    asdf install python <latest|3.11.4>
 
     # set stable to system python
     asdf global python latest
