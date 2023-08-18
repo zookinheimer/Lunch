@@ -24,6 +24,9 @@ def random_restaurant():
         multi_line=True,
         close_button=True,
     )
+    # toggle input form visibility if open
+    add_input.set_visibility(False)
+    del_input.set_visibility(False)
 
 
 def all_restaurants():
@@ -37,6 +40,9 @@ def all_restaurants():
         multi_line=True,
         close_button=True,
     )
+    # toggle input form visibility if open
+    add_input.set_visibility(False)
+    del_input.set_visibility(False)
 
 
 def update_database(*args):
@@ -46,11 +52,31 @@ def update_database(*args):
     option = radio.value.lower()
 
     if args[0] == "add":
-        add_restaurant(name, option)
+        result = add_restaurant(name, option)
+        if result is False:
+            return ui.notify(
+                f"{name} already exists in database.",
+                position="center",
+                multi_line=True,
+                close_button=True,
+            )
     elif args[0] == "remove":
-        delete_restaurant(name)
+        result = delete_restaurant(name)
+        if result is None:
+            return ui.notify(
+                f"{name} does not exist in database.",
+                position="center",
+                multi_line=True,
+                close_button=True,
+            )
+
+    if args[0] == "add":
+        msg = f"{name} has been {args[0]}ed."
+    elif args[0] == "remove":
+        msg = f"{name} has been {args[0]}d."
+
     ui.notify(
-        f"{name} has been {args[0]}ed.",
+        msg,
         position="center",
         multi_line=True,
         close_button=True,
@@ -96,37 +122,48 @@ async def index(client: Client):
             ui.button("Roll Lunch", on_click=random_restaurant)
 
             # * add restaurant to database
-            add_btn = ui.button("Add Restaurant", on_click=lambda value: "add")
+            add_btn = ui.button(
+                "Add Restaurant",
+                on_click=lambda: (add_input.set_visibility(True), del_input.set_visibility(False))
+            )
 
             # * delete restaurant from database
-            del_btn = ui.button("Delete Restaurant", on_click=lambda value: "remove")
+            del_btn = ui.button(
+                "Delete Restaurant",
+                on_click=lambda: (del_input.set_visibility(True), add_input.set_visibility(False))
+            )
 
             # * list all restaurants
             ui.button("List All", on_click=all_restaurants)
 
-    # TODO: `bind_visibility` to button presses (add_btn, del_btn)
+    # TODO: clear input form on submit
     with ui.row().classes(button_props) as form:
         # * add restaurant
         with form:
+            global add_input
             add_input = ui.input(
                 label="Add Restaurant",
                 placeholder="Restaurant Name",
                 validation={'Input too long': lambda value: len(value) < 25}
             ).props('clearable').on(
                 'keydown.enter',
-                lambda: update_database("add", (add_input.value).title())
+                lambda: (update_database("add", (add_input.value)), add_input.set_visibility(False))
             )
+            add_input.set_visibility(False)
 
         # * delete restaurant
         with form:
+            global del_input
             del_input = ui.input(
                 label="Remove Restaurant",
                 placeholder="Restaurant Name",
                 validation={'Input too long': lambda value: len(value) < 25}
             ).props('clearable').on(
                 'keydown.enter',
-                lambda: update_database("remove", (del_input.value).title())
+                lambda: (update_database("remove", (del_input.value)), del_input.set_visibility(False))
             )
+            del_input.set_visibility(False)
+
 
 # website
 ui.run()

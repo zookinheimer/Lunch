@@ -5,6 +5,7 @@ import random
 from datetime import datetime
 from pathlib import Path
 from sqlalchemy import Column, func, Integer, String, Table, Text, TIMESTAMP
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import Optional, Dict, List, Tuple
 
@@ -92,33 +93,49 @@ def rng_restaurant(option):
             return random.choice(restaurants)
 
 
+# TODO: validate input beyond `title()` and `strip()` (e.g., "Freddie'S")
 def add_restaurant(name, option):
     """Add restaurant to database."""
     with Session(engine) as session:
         print(f"Adding {name} to database.")
-        statement = select(t_lunch_list).where(t_lunch_list.c.restaurant == name)
-        restaurant = session.exec(statement).first()
-        if restaurant:
-            return print(f"{name} already exists in database.")
-        else:
+        statement = select(t_lunch_list.c.restaurant).where(func.lower(t_lunch_list.c.restaurant) == func.lower(name))
+        try:
+            restaurant = session.exec(statement).one()
+            print(f"{name} already exists in database.")
+            return False
+        except NoResultFound:
             new_restaurant = t_lunch_list.insert().values(restaurant=name, option=option)
             session.execute(new_restaurant)
             session.commit()
-            return print(f"{name} added to database.")
+            print(f"{name} added to database.")
 
 
 def delete_restaurant(name):
     """Delete restaurant from database."""
     with Session(engine) as session:
         print(f"Deleting {name} from database.")
-        statement = select(t_lunch_list.c.id).where(t_lunch_list.c.restaurant == name)
-        restaurant_id = session.exec(statement).first()
+        statement = select(t_lunch_list.c.id).where(func.lower(t_lunch_list.c.restaurant) == func.lower(name))
+        restaurant_id = session.exec(statement).one()
+
         if not restaurant_id:
-            return print(f"{name} does not exist in database.")
+            print(f"{name} does not exist in database.")
+            return None
         else:
+            # DELETE FROM "lunch_list" WHERE "id" = '24';
             statement = t_lunch_list.delete().where(t_lunch_list.c.id == restaurant_id)
+            session.execute(statement, {"restaurant_id": restaurant_id})
             session.commit()
-            return print(f"{name} deleted from database.")
+
+            # trust, but verify
+            statement = select(t_lunch_list.c.restaurant).where(t_lunch_list.c.id == restaurant_id)
+            result = session.exec(statement).first()
+
+            if result:
+                print(f"{name} still exists in database.")
+                return False
+            else:
+                print(f"{name} deleted from database.")
+                return True
 
 
 # def calculate_lunch():
