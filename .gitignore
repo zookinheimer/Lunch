@@ -3,6 +3,7 @@ lunch.db
 scratch*.*
 auth/
 .htpasswd
+.ruff_cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
