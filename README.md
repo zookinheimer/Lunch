@@ -124,7 +124,7 @@ Additional tooling includes but is not limited to:
 * Usage
     ```bash
     # run linter
-    ruff check <.|main.py>
+    ruff check <.|main.py>      # `--fix` arg to use a one-liner 
 
     # run linter and fix issues
     ruff fix .
