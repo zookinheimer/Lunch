@@ -6,155 +6,182 @@
 
 ## Setup
 * Install 
-    * [asdf](https://asdf-vm.com/guide/getting-started.html)
-    * [poetry](https://python-poetry.org/docs/)
-    * [docker-compose](https://docs.docker.com/compose/install/)
-    * [editorconfig](https://editorconfig.org/)
-    * [playwright](https://playwright.dev/python/docs/intro#installation)
+  * [asdf](https://asdf-vm.com/guide/getting-started.html)
+  * [poetry](https://python-poetry.org/docs/)
+  * [docker-compose](https://docs.docker.com/compose/install/)
+  * [editorconfig](https://editorconfig.org/)
+  * [playwright](https://playwright.dev/python/docs/intro#installation)
 
-## Usage
-### `lunch.py`
+## Quickstart
+
 ```bash
-# install tkinter library on macos
-brew install python-tk
+# clone repo
+git clone https://github.com/xBromsson/marley.git
 
-# asdf
-asdf install python 3.9
+# change directory
+cd lunch/
 
-# asdf local version of python
-asdf local 3.9.10
+# install dependencies
+python -m pip install -r requirements.txt
 
-# run app in poetry
-poetry env use 3.9.10
-poetry shell
-python lunch.py
+# run program
+python main.py
+
+# quit program
+ctrl + c
 ```
 
-### Poetry
+## Development
+
+### Python virtual environment
+
 ```bash
-# Install
-curl -sSL https://install.python-poetry.org | $(which python3) -
+# create virtual environment
+python -m venv .venv
 
-# Change config
-poetry config virtualenvs.in-project true           # .venv in `pwd`
-poetry config experimental.new-installer false      # fixes JSONDecodeError on Python3.10
+# activate virtual environment
+source .venv/bin/activate
 
-# Activate virtual environment (venv)
-poetry shell
-
-# Deactivate venv
-exit  # ctrl-d
-
-# Install multiple libraries
-poetry add google-auth google-api-python-client
-
-# Initialize existing project
-poetry init
-
-# Run script and exit environment
-poetry run python your_script.py
-
-# Install from requirements.txt
-poetry add `cat requirements.txt`
-
-# Update dependencies
-poetry update
-
-# Remove library
-poetry remove google-auth
-
-# Generate requirements.txt
-poetry export -f requirements.txt --output requirements.txt --without-hashes
+# install dependencies
+python -m pip install -r requirements.txt 
 ```
 
-### Docker
-```bash
-# clean build (remove `--no-cache` for speed)
-docker-compose build --no-cache --parallel
+### Additional tooling
 
-# start container
-docker-compose up --remove-orphans -d
+Additional tooling includes but is not limited to:
 
-# exec into container
-docker attach lunch
+#### asdf
 
-# run command inside container
-python hello.py
-
-# destroy container
-docker-compose down
-```
-
-#### Docker Troubleshooting
-* Watch logs in real-time: `docker-compose logs -tf --tail="50" hello`
-* Check exit code
+* Install [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
+* Usage
     ```bash
-    $ docker-compose ps
-    Name                          Command               State    Ports
-    ------------------------------------------------------------------------------
-    docker_python      python manage.py runserver ...   Exit 0
+    # add python plugin
+    asdf plugin-add python
+
+    # install stable python
+    asdf install python <latest|3.11.4>
+
+    # set stable to system python
+    asdf global python latest
+
+    # add poetry asdf plugin
+    asdf plugin-add poetry https://github.com/asdf-community/asdf-poetry.git
+
+    # install latest version via asdf
+    asdf install poetry <latest|1.5.1>
+
+    # set latest version as default
+    asdf global poetry latest
     ```
 
-## Packaging
-Local test [pypiserver](https://github.com/pypiserver/pypiserver) and [official repo](https://pypi.org).
+#### poetry
 
-**NOTE**  
-Confirm repo name is [available](https://pypi.org/help/#project-name) before uploading to PyPi.
+* Install [poetry](https://python-poetry.org/docs/#installation) if not using `asdf`
+* Usage
+    ```bash
+    # use venv in repo
+    poetry config virtualenvs.in-project true
+
+    # install dependencies
+    poetry install
+
+    # add new dependency
+    poetry add <package>
+
+    # remove dependency
+    poetry remove <package>
+
+    # activate virtual environment
+    poetry shell
+
+    # run program
+    python main.py
+
+    # exit virtual environment
+    exit
+    ```
+
+#### vscode
+
+* Install [vscode](https://code.visualstudio.com/download)
+* Setup [vscode settings](.vscode/launch.json)
+  * Handles debug settings for generic python programs as well as others (e.g., django, flask, etc.)
+* Dev Containers
+  * [Command palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (⇧⌘P) > Dev Containers: Reopen in Container
+  * F5 for debug
+      * May need to select interpreter (e.g., `/opt/venv/bin/python`) first
+
+#### ruff
+
+* Installed via `poetry` or `pip`
+* Add VSCode plugin for [ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+  * **Optional**: disable pylance in favor of ruff in [repo settings](.vscode/settings.json)
+    ```json
+    "python.analysis.ignore": [
+      "*"
+    ],
+    ```
+* Usage
+    ```bash
+    # run linter
+    ruff check <.|main.py>      # `--fix` arg to use a one-liner 
+
+    # run linter and fix issues
+    ruff fix .
+
+    # run tests
+    ruff
+
+    # run tests with coverage
+    ruff --coverage
+
+    # run tests with coverage and open in browser
+    ruff --coverage --open
+    ```
+
+#### pre-commit
 
 ```bash
-## BOTH
-# build package
-poetry build
+# install pre-commit dev dependency
+poetry install
 
-## DOCKER
-# setup mount directory
-mkdir -p auth
+# install pre-commit hooks
+pre-commit install
 
-# use passlib to setup .htpasswd
-htpasswd -sc auth/.htpasswd someuser
-
-# run local pypi
-docker run -p 80:8080 -v $(pwd)/auth/:/data/auth pypiserver/pypiserver:latest -P /data/auth/.htpasswd -a update,download,list /data/packages
-
-# configure repo
-poetry config repositories.test http://localhost
-
-# "upload" package to docker
-poetry publish -r test
-
-## PYPI
-# "upload" package to pypi (build switch is optional)
-export API_TOKEN=super_secret_api_key
-poetry publish -u __token__ -p $API_TOKEN --build
+# update
+pre-commit autoupdate
 ```
 
+#### editorconfig
+
+Handles formatting of files. [Install the editorconfig plugin](https://editorconfig.org/#download) for your editor of choice.
+
+#### dependabot
+
+* [Dependabot](https://dependabot.com/) is a GitHub tool that automatically creates pull requests to keep dependencies up to date.
+
 ## TODO
-* ~~Add README.md~~
-* ~~PR~~
-* ~~Clone~~
+
 * QA
-    * Excluded `lunch.db` in `.gitignore`
-        * Will pollute original DB with future commits
-        * Possibly add a separate shell script to populate robust sqlite DB
-    * macOS 12.1
-        * Changed `root.geometry` to `"500x100"
-        * `List All` button doesn't scroll down list
+  * Desktop
+    * macOS: `native` form input is broken bc `pywebview`
+    * Linux
+    * Windows
+  * Mobile
+    * iOS
+    * Android
 * Document
-* Convert to PySimpleGUI
+* ~~Convert to ~~PySimpleGUI~~ NiceGUI~~
 * Extend
-    * Fancy category
-    * Images
-    * Menus
-    * API calls to Yelp, Google, etc.
-    * Faithful tkinter translation via
-        * [Dart](https://dart.dev/)
-        * [Flask](https://flask.palletsprojects.com/en/2.0.x/)
-        * [Kotlin](https://kotlinlang.org/)
-        * [Svelte](https://svelte.dev)
-    * Tinder swipe right/left mechanic hehehe
+  * [semantic-release](https://github.com/semantic-release/semantic-release)
+  * sqlite -> postgres
+  * Fancy category
+  * Images
+  * Menus
+  * API calls to Yelp, Google, etc.
+  * Tinder swipe right/left mechanic hehehe
 
 ## Further Reading
-[Call reference - PySimpleGUI](https://pysimplegui.readthedocs.io/en/latest/call%20reference)
 
 [Python Poetry, finally easy build and deploy packages | by Jose Alberto Torres Agüera | Lambda Automotive | Medium](https://medium.com/lambda-automotive/python-poetry-finally-easy-build-and-deploy-packages-e1e84c23401f)  
 
