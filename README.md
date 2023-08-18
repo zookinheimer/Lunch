@@ -139,13 +139,27 @@ Additional tooling includes but is not limited to:
     ruff --coverage --open
     ```
 
-#### dependabot
+#### pre-commit
 
-* [Dependabot](https://dependabot.com/) is a GitHub tool that automatically creates pull requests to keep dependencies up to date.
+```bash
+# install pre-commit dev dependency
+poetry install
+
+# install pre-commit hooks
+pre-commit install
+
+# update
+pre-commit autoupdate
+```
 
 #### editorconfig
 
 Handles formatting of files. [Install the editorconfig plugin](https://editorconfig.org/#download) for your editor of choice.
+
+#### dependabot
+
+* [Dependabot](https://dependabot.com/) is a GitHub tool that automatically creates pull requests to keep dependencies up to date.
+
 
 ## TODO
 

@@ -20,6 +20,7 @@ pywebview = "^4.2.2"
 [tool.poetry.group.dev.dependencies]
 icecream = "^2.1.1"
 ipython = "^8.14.0"
+pre-commit = "^3.3.3"
 rich = "^13.5.2"
 ruff = "^0.0.285"
 tk = "^0.1.0"
