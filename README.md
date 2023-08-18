@@ -106,6 +106,10 @@ Additional tooling includes but is not limited to:
 * Install [vscode](https://code.visualstudio.com/download)
 * Setup [vscode settings](.vscode/launch.json)
   * Handles debug settings for generic python programs as well as others (e.g., django, flask, etc.)
+* Dev Containers
+  * [Command palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (⇧⌘P) > Dev Containers: Reopen in Container
+  * F5 for debug
+      * May need to select interpreter (e.g., `/opt/venv/bin/python`) first
 
 #### ruff
 
