@@ -7,6 +7,7 @@ authors = [
     "pythoninthegrass <4097471+pythoninthegrass@users.noreply.github.com>"
 ]
 readme = "README.md"
+license = "Unlicense"
 
 [tool.poetry.dependencies]
 python = "^3.11"
