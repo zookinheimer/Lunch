@@ -4,6 +4,7 @@ import flet as ft
 from flet import (
     Column,
     Container,
+    Dropdown,
     ElevatedButton,
     RoundedRectangleBorder,
     Page,
@@ -12,15 +13,21 @@ from flet import (
     UserControl,
     border_radius,
     colors,
+    dropdown
 )
+import logging
 import random
 # import sqlite3
 # from datetime import datetime
-from util import *
+from util import create_db_and_tables, get_all_restaurants, get_restaurants, rng_restaurant
 from dataclasses import dataclass, field
+from decouple import config
 from pathlib import Path
 # from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import Optional, Dict, List, Tuple
+
+# log level
+logging.basicConfig(level=logging.INFO)
 
 
 @dataclass
@@ -43,7 +50,26 @@ class Lunch(UserControl):
     def __init__(self, page: Page):
         super().__init__()
         self.page = page
+        self.choice = None
+        self.snack_bar = None
         self._build()
+
+
+        if button.data == "roll":
+        def on_click(self, button):
+            self.roll_lunch(self.choice.value)
+        elif button.data == "delete":
+            self.delete_restaurant()
+        elif button.data == "add":
+            self.add_restaurant()
+        elif button.data == "list":
+            self.list_all()
+        self.snack_bar = ft.SnackBar(
+            content=ft.Text(f"{button.text} clicked!"),
+            duration=ft.Duration(milliseconds=5000),
+        )
+        page.add(self.snack_bar)
+        self.snack_bar.show()
 
 
     def _build(self):
@@ -61,42 +87,17 @@ class Lunch(UserControl):
         )
         page.add(ft.Text("Click below to find out what's for Lunch:"), choice)
 
+        # TODO: use inline row declaration instead of custom button class (QA)
         row = Row(
             controls=[
-                Container(CustomButton(text="Roll Lunch")(page), alignment=ft.alignment.center, on_click=self.button_clicked, data="roll"),
-                Container(CustomButton(text="Delete Restaurant")(page), alignment=ft.alignment.center, on_click=self.button_clicked, data="delete"),
-                Container(CustomButton(text="Add Restaurant")(page), alignment=ft.alignment.center, on_click=self.button_clicked, data="add"),
-                Container(CustomButton(text="List All")(page), alignment=ft.alignment.center, on_click=self.button_clicked, data="list"),
+                Container(CustomButton(text="Roll Lunch")(page), alignment=ft.alignment.center, on_click=self.on_click, data="roll"),
+                Container(CustomButton(text="Delete Restaurant")(page), alignment=ft.alignment.center, on_click=self.on_click, data="delete"),
+                Container(CustomButton(text="Add Restaurant")(page), alignment=ft.alignment.center, on_click=self.on_click, data="add"),
+                Container(CustomButton(text="List All")(page), alignment=ft.alignment.center, on_click=self.on_click, data="list"),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
         page.add(row)
-
-    # TODO: connect to db; bind to buttons; create views based on button clicks
-    def roll_lunch(self, option):
-        restaurant = rng_restaurant(option)
-        print(restaurant)
-
-    def delete_restaurant(self):
-        pass
-
-    def add_restaurant(self):
-        pass
-
-    def list_all(self):
-        pass
-
-    # TODO: debug row + button click
-    def button_clicked(self, e):
-        data = e.control.data
-        if self.result.value == "roll" or data == "roll":
-            self.roll_lunch(data)
-        elif data == "delete":
-            self.delete_restaurant()
-        elif data == "add":
-            self.add_restaurant()
-        elif data == "list":
-            self.list_all()
 
 
 def main(page: Page):
@@ -107,39 +108,10 @@ def main(page: Page):
     page.horizontal_alignment = "center"
 
     # create application instance
-    lunch = Lunch(page)
+    app = Lunch(page)
 
     # add application's root control to page
-    page.add(lunch)
+    page.add(app)
 
-    def bs_dismissed(e):
-        print("Dismissed!")
-
-    def show_bs(e):
-        bs.open = True
-        bs.update()
-
-    def close_bs(e):
-        bs.open = False
-        bs.update()
-
-    bs = ft.BottomSheet(
-        ft.Container(
-            ft.Column(
-                [
-                    ft.Text("This is sheet's content!"),
-                    ft.ElevatedButton("Close bottom sheet", on_click=close_bs),
-                ],
-                tight=True,
-            ),
-            padding=10,
-        ),
-        open=True,
-        on_dismiss=bs_dismissed,
-    )
-    page.overlay.append(bs)
-    page.add(ft.ElevatedButton("Display bottom sheet", on_click=show_bs))
-
-    Lunch.button_clicked = show_bs
 
 ft.app(target=main)
